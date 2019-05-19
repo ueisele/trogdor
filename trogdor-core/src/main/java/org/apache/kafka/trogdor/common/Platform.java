@@ -18,8 +18,8 @@
 package org.apache.kafka.trogdor.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.kafka.common.utils.Scheduler;
-import org.apache.kafka.common.utils.Utils;
+import org.apache.kafka.trogdor.common.utils.Scheduler;
+import org.apache.kafka.trogdor.common.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;

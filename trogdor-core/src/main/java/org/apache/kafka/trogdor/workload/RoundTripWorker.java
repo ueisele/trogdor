@@ -32,15 +32,12 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.errors.TimeoutException;
 import org.apache.kafka.common.errors.WakeupException;
-import org.apache.kafka.common.internals.KafkaFutureImpl;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
-import org.apache.kafka.common.utils.Time;
-import org.apache.kafka.common.utils.Utils;
-import org.apache.kafka.trogdor.common.JsonUtil;
-import org.apache.kafka.trogdor.common.Platform;
-import org.apache.kafka.trogdor.common.ThreadUtils;
-import org.apache.kafka.trogdor.common.WorkerUtils;
+import org.apache.kafka.trogdor.common.*;
+import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
+import org.apache.kafka.trogdor.common.utils.Time;
+import org.apache.kafka.trogdor.common.utils.Utils;
 import org.apache.kafka.trogdor.task.TaskWorker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
 import org.slf4j.Logger;
@@ -57,6 +54,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.util.stream.Collectors.joining;
 
 public class RoundTripWorker implements TaskWorker {
     private static final int THROTTLE_PERIOD_MS = 100;
@@ -139,7 +138,7 @@ public class RoundTripWorker implements TaskWorker {
                     throw new RuntimeException("You must specify at least one active topic.");
                 }
                 status.update(new TextNode("Creating " + newTopics.keySet().size() + " topic(s)"));
-                WorkerUtils.createTopics(log, spec.bootstrapServers(), spec.commonClientConf(),
+                KafkaWorkerUtils.createTopics(log, spec.bootstrapServers(), spec.commonClientConf(),
                     spec.adminClientConf(), newTopics, true);
                 status.update(new TextNode("Created " + newTopics.keySet().size() + " topic(s)"));
                 toSendTracker = new ToSendTracker(spec.maxMessages());
@@ -210,7 +209,7 @@ public class RoundTripWorker implements TaskWorker {
             props.put(ProducerConfig.ACKS_CONFIG, "all");
             props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 105000);
             // user may over-write the defaults with common client config and producer config
-            WorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.producerConf());
+            KafkaWorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.producerConf());
             producer = new KafkaProducer<>(props, new ByteArraySerializer(),
                 new ByteArraySerializer());
             int perPeriod = WorkerUtils.
@@ -311,7 +310,7 @@ public class RoundTripWorker implements TaskWorker {
                 }
             }
             log.info("{}: consumer waiting for {} message(s), starting with: {}",
-                id, numToReceive, Utils.join(list, ", "));
+                id, numToReceive, list.stream().map(String::valueOf).collect(joining(", ")));
         }
     }
 
@@ -327,7 +326,7 @@ public class RoundTripWorker implements TaskWorker {
             props.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, 105000);
             props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 100000);
             // user may over-write the defaults with common client config and consumer config
-            WorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.consumerConf());
+            KafkaWorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.consumerConf());
             consumer = new KafkaConsumer<>(props, new ByteArrayDeserializer(),
                 new ByteArrayDeserializer());
             consumer.assign(partitions);

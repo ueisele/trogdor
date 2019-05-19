@@ -26,17 +26,14 @@ import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.Cluster;
 import org.apache.kafka.common.Node;
-import org.apache.kafka.common.internals.KafkaFutureImpl;
 import org.apache.kafka.common.metrics.Metrics;
 import org.apache.kafka.common.network.ChannelBuilder;
 import org.apache.kafka.common.network.Selector;
 import org.apache.kafka.common.utils.LogContext;
 import org.apache.kafka.common.utils.Time;
-import org.apache.kafka.common.utils.Utils;
-import org.apache.kafka.trogdor.common.JsonUtil;
-import org.apache.kafka.trogdor.common.Platform;
-import org.apache.kafka.trogdor.common.ThreadUtils;
-import org.apache.kafka.trogdor.common.WorkerUtils;
+import org.apache.kafka.trogdor.common.*;
+import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
+import org.apache.kafka.trogdor.common.utils.Utils;
 import org.apache.kafka.trogdor.task.TaskWorker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
 import org.slf4j.Logger;
@@ -137,7 +134,7 @@ public class ConnectionStressWorker implements TaskWorker {
         ConnectStressor(ConnectionStressSpec spec) {
             Properties props = new Properties();
             props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, spec.bootstrapServers());
-            WorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.commonClientConf());
+            KafkaWorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.commonClientConf());
             this.conf = new AdminClientConfig(props);
             List<InetSocketAddress> addresses = ClientUtils.parseAndValidateAddresses(
                 conf.getList(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG),
@@ -192,7 +189,7 @@ public class ConnectionStressWorker implements TaskWorker {
         FetchMetadataStressor(ConnectionStressSpec spec) {
             this.props = new Properties();
             this.props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, spec.bootstrapServers());
-            WorkerUtils.addConfigsToProperties(this.props, spec.commonClientConf(), spec.commonClientConf());
+            KafkaWorkerUtils.addConfigsToProperties(this.props, spec.commonClientConf(), spec.commonClientConf());
         }
 
         @Override

@@ -23,13 +23,10 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.internals.KafkaFutureImpl;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
-import org.apache.kafka.common.utils.Time;
-import org.apache.kafka.trogdor.common.JsonUtil;
-import org.apache.kafka.trogdor.common.Platform;
-import org.apache.kafka.trogdor.common.ThreadUtils;
-import org.apache.kafka.trogdor.common.WorkerUtils;
+import org.apache.kafka.trogdor.common.*;
+import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
+import org.apache.kafka.trogdor.common.utils.Time;
 import org.apache.kafka.trogdor.task.TaskWorker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
 import org.apache.kafka.trogdor.workload.TransactionGenerator.TransactionAction;
@@ -104,7 +101,7 @@ public class ProduceBenchWorker implements TaskWorker {
                     newTopics.put(topicName, partSpec.newTopic(topicName));
                 }
                 status.update(new TextNode("Creating " + newTopics.keySet().size() + " topic(s)"));
-                WorkerUtils.createTopics(log, spec.bootstrapServers(), spec.commonClientConf(),
+                KafkaWorkerUtils.createTopics(log, spec.bootstrapServers(), spec.commonClientConf(),
                                          spec.adminClientConf(), newTopics, false);
                 status.update(new TextNode("Created " + newTopics.keySet().size() + " topic(s)"));
                 executor.submit(new SendRecords(active));
@@ -196,7 +193,7 @@ public class ProduceBenchWorker implements TaskWorker {
             if (enableTransactions)
                 props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "produce-bench-transaction-id-" + UUID.randomUUID());
             // add common client configs to producer properties, and then user-specified producer configs
-            WorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.producerConf());
+            KafkaWorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.producerConf());
             this.producer = new KafkaProducer<>(props, new ByteArraySerializer(), new ByteArraySerializer());
             this.keys = new PayloadIterator(spec.keyGenerator());
             this.values = new PayloadIterator(spec.valueGenerator());

@@ -18,43 +18,33 @@
 package org.apache.kafka.trogdor.common;
 
 
+import org.apache.kafka.clients.admin.MockAdminClient;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.admin.TopicDescription;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.TopicPartitionInfo;
-
-import org.apache.kafka.common.Node;
-import org.apache.kafka.clients.admin.MockAdminClient;
-
 import org.apache.kafka.common.errors.TopicExistsException;
-import org.apache.kafka.common.utils.Utils;
+import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.kafka.clients.admin.NewTopic;
-import org.junit.Before;
-import org.junit.Test;
+import java.util.*;
+
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
+public class KafkaWorkerUtilsTest {
 
-public class WorkerUtilsTest {
-
-    private static final Logger log = LoggerFactory.getLogger(WorkerUtilsTest.class);
+    private static final Logger log = LoggerFactory.getLogger(KafkaWorkerUtilsTest.class);
 
     private final Node broker1 = new Node(0, "testHost-1", 1234);
     private final Node broker2 = new Node(1, "testHost-2", 1234);
     private final Node broker3 = new Node(1, "testHost-3", 1234);
-    private final List<Node> cluster = Arrays.asList(broker1, broker2, broker3);
+    private final List<Node> cluster = asList(broker1, broker2, broker3);
     private final List<Node> singleReplica = Collections.singletonList(broker1);
 
     private static final String TEST_TOPIC = "test-topic-1";
@@ -75,7 +65,7 @@ public class WorkerUtilsTest {
     public void testCreateOneTopic() throws Throwable {
         Map<String, NewTopic> newTopics = Collections.singletonMap(TEST_TOPIC, NEW_TEST_TOPIC);
 
-        WorkerUtils.createTopics(log, adminClient, newTopics, true);
+        KafkaWorkerUtils.createTopics(log, adminClient, newTopics, true);
         assertEquals(Collections.singleton(TEST_TOPIC), adminClient.listTopics().names().get());
         assertEquals(
             new TopicDescription(
@@ -91,7 +81,7 @@ public class WorkerUtilsTest {
     public void testCreateRetriesOnTimeout() throws Throwable {
         adminClient.timeoutNextRequest(1);
 
-        WorkerUtils.createTopics(
+        KafkaWorkerUtils.createTopics(
             log, adminClient, Collections.singletonMap(TEST_TOPIC, NEW_TEST_TOPIC), true);
 
         assertEquals(
@@ -106,7 +96,7 @@ public class WorkerUtilsTest {
 
     @Test
     public void testCreateZeroTopicsDoesNothing() throws Throwable {
-        WorkerUtils.createTopics(log, adminClient, Collections.<String, NewTopic>emptyMap(), true);
+        KafkaWorkerUtils.createTopics(log, adminClient, Collections.<String, NewTopic>emptyMap(), true);
         assertEquals(0, adminClient.listTopics().names().get().size());
     }
 
@@ -125,7 +115,7 @@ public class WorkerUtilsTest {
         newTopics.put("one-more-topic",
                       new NewTopic("one-more-topic", TEST_PARTITIONS, TEST_REPLICATION_FACTOR));
 
-        WorkerUtils.createTopics(log, adminClient, newTopics, true);
+        KafkaWorkerUtils.createTopics(log, adminClient, newTopics, true);
     }
 
     @Test(expected = RuntimeException.class)
@@ -139,7 +129,7 @@ public class WorkerUtilsTest {
             tpInfo,
             null);
 
-        WorkerUtils.createTopics(
+        KafkaWorkerUtils.createTopics(
             log, adminClient, Collections.singletonMap(TEST_TOPIC, NEW_TEST_TOPIC), false);
     }
 
@@ -156,7 +146,7 @@ public class WorkerUtilsTest {
             tpInfo,
             null);
 
-        WorkerUtils.createTopics(
+        KafkaWorkerUtils.createTopics(
             log, adminClient,
             Collections.singletonMap(
                 existingTopic,
@@ -170,7 +160,7 @@ public class WorkerUtilsTest {
         // should be no topics before the call
         assertEquals(0, adminClient.listTopics().names().get().size());
 
-        WorkerUtils.createTopics(
+        KafkaWorkerUtils.createTopics(
             log, adminClient, Collections.singletonMap(TEST_TOPIC, NEW_TEST_TOPIC), false);
 
         assertEquals(Collections.singleton(TEST_TOPIC), adminClient.listTopics().names().get());
@@ -200,14 +190,14 @@ public class WorkerUtilsTest {
                    new NewTopic(existingTopic, tpInfo.size(), TEST_REPLICATION_FACTOR));
         topics.put(TEST_TOPIC, NEW_TEST_TOPIC);
 
-        WorkerUtils.createTopics(log, adminClient, topics, false);
+        KafkaWorkerUtils.createTopics(log, adminClient, topics, false);
 
-        assertEquals(Utils.mkSet(existingTopic, TEST_TOPIC), adminClient.listTopics().names().get());
+        assertEquals(new HashSet<>(asList(existingTopic, TEST_TOPIC)), adminClient.listTopics().names().get());
     }
 
     @Test
     public void testCreateNonExistingTopicsWithZeroTopicsDoesNothing() throws Throwable {
-        WorkerUtils.createTopics(
+        KafkaWorkerUtils.createTopics(
             log, adminClient, Collections.<String, NewTopic>emptyMap(), false);
         assertEquals(0, adminClient.listTopics().names().get().size());
     }
@@ -223,7 +213,7 @@ public class WorkerUtilsTest {
         resultProps.put(ProducerConfig.CLIENT_ID_CONFIG, "test-client");
         resultProps.put(ProducerConfig.LINGER_MS_CONFIG, "1000");
 
-        WorkerUtils.addConfigsToProperties(
+        KafkaWorkerUtils.addConfigsToProperties(
             props,
             Collections.singletonMap(ProducerConfig.CLIENT_ID_CONFIG, "test-client"),
             Collections.singletonMap(ProducerConfig.LINGER_MS_CONFIG, "1000"));
@@ -241,7 +231,7 @@ public class WorkerUtilsTest {
         resultProps.put(ProducerConfig.ACKS_CONFIG, "1");
         resultProps.put(ProducerConfig.LINGER_MS_CONFIG, "1000");
 
-        WorkerUtils.addConfigsToProperties(
+        KafkaWorkerUtils.addConfigsToProperties(
             props,
             Collections.singletonMap(ProducerConfig.ACKS_CONFIG, "1"),
             Collections.singletonMap(ProducerConfig.LINGER_MS_CONFIG, "1000"));
@@ -258,7 +248,7 @@ public class WorkerUtilsTest {
         resultProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         resultProps.put(ProducerConfig.ACKS_CONFIG, "0");
 
-        WorkerUtils.addConfigsToProperties(
+        KafkaWorkerUtils.addConfigsToProperties(
             props,
             Collections.singletonMap(ProducerConfig.ACKS_CONFIG, "1"),
             Collections.singletonMap(ProducerConfig.ACKS_CONFIG, "0"));
@@ -273,12 +263,12 @@ public class WorkerUtilsTest {
         makeExistingTopicWithOneReplica(topic2, 20);
 
         Collection<TopicPartition> topicPartitions =
-            WorkerUtils.getMatchingTopicPartitions(adminClient, topic2, 0, 2);
+            KafkaWorkerUtils.getMatchingTopicPartitions(adminClient, topic2, 0, 2);
         assertEquals(
-            Utils.mkSet(
+            new HashSet<>(asList(
                 new TopicPartition(topic2, 0), new TopicPartition(topic2, 1),
                 new TopicPartition(topic2, 2)
-            ),
+            )),
             new HashSet<>(topicPartitions)
         );
     }
@@ -293,12 +283,12 @@ public class WorkerUtilsTest {
         makeExistingTopicWithOneReplica(topic3, 30);
 
         Collection<TopicPartition> topicPartitions =
-            WorkerUtils.getMatchingTopicPartitions(adminClient, ".*-topic$", 0, 1);
+            KafkaWorkerUtils.getMatchingTopicPartitions(adminClient, ".*-topic$", 0, 1);
         assertEquals(
-            Utils.mkSet(
+            new HashSet<>(asList(
                 new TopicPartition(topic1, 0), new TopicPartition(topic1, 1),
                 new TopicPartition(topic2, 0), new TopicPartition(topic2, 1)
-            ),
+            )),
             new HashSet<>(topicPartitions)
         );
     }

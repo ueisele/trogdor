@@ -18,8 +18,8 @@ package org.apache.kafka.trogdor.rest;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
-import org.apache.kafka.common.errors.InvalidRequestException;
-import org.apache.kafka.common.errors.SerializationException;
+import org.apache.kafka.trogdor.common.errors.InvalidRequestException;
+import org.apache.kafka.trogdor.common.errors.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

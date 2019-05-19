@@ -26,14 +26,11 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.ConfigException;
-import org.apache.kafka.common.internals.KafkaFutureImpl;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
-import org.apache.kafka.common.utils.Time;
-import org.apache.kafka.common.utils.Utils;
-import org.apache.kafka.trogdor.common.JsonUtil;
-import org.apache.kafka.trogdor.common.Platform;
-import org.apache.kafka.trogdor.common.ThreadUtils;
-import org.apache.kafka.trogdor.common.WorkerUtils;
+import org.apache.kafka.trogdor.common.*;
+import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
+import org.apache.kafka.trogdor.common.utils.Time;
+import org.apache.kafka.trogdor.common.utils.Utils;
 import org.apache.kafka.trogdor.task.TaskWorker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
 import org.slf4j.Logger;
@@ -144,7 +141,7 @@ public class ConsumeBenchWorker implements TaskWorker {
             props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 100000);
             // these defaults maybe over-written by the user-specified commonClientConf or consumerConf
-            WorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.consumerConf());
+            KafkaWorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.consumerConf());
             return new ThreadSafeConsumer(new KafkaConsumer<>(props, new ByteArrayDeserializer(), new ByteArrayDeserializer()), clientId);
         }
 

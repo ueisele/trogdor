@@ -22,15 +22,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.kafka.common.KafkaException;
-import org.apache.kafka.common.errors.InvalidRequestException;
-import org.apache.kafka.common.utils.Scheduler;
-import org.apache.kafka.common.utils.Time;
-import org.apache.kafka.common.utils.Utils;
-import org.apache.kafka.trogdor.common.JsonUtil;
-import org.apache.kafka.trogdor.common.Node;
-import org.apache.kafka.trogdor.common.Platform;
-import org.apache.kafka.trogdor.common.ThreadUtils;
+import com.google.common.base.Joiner;
+import org.apache.kafka.trogdor.common.*;
+import org.apache.kafka.trogdor.common.errors.InvalidRequestException;
+import org.apache.kafka.trogdor.common.utils.Scheduler;
+import org.apache.kafka.trogdor.common.utils.Time;
 import org.apache.kafka.trogdor.rest.*;
 import org.apache.kafka.trogdor.task.TaskController;
 import org.apache.kafka.trogdor.task.TaskSpec;
@@ -121,7 +117,7 @@ public final class TaskManager {
             }
         }
         log.info("Created TaskManager for agent(s) on: {}",
-            Utils.join(nodeManagers.keySet(), ", "));
+            String.join(", ", nodeManagers.keySet()));
     }
 
     class ManagedTask {
@@ -217,11 +213,11 @@ public final class TaskManager {
                 }
             }
             if (!nonExistentNodeNames.isEmpty()) {
-                throw new KafkaException("Unknown node names: " +
-                        Utils.join(nonExistentNodeNames, ", "));
+                throw new TrogdorException("Unknown node names: " +
+                        String.join(", ", nonExistentNodeNames));
             }
             if (validNodeNames.isEmpty()) {
-                throw new KafkaException("No node names specified.");
+                throw new TrogdorException("No node names specified.");
             }
             return validNodeNames;
         }
@@ -377,7 +373,7 @@ public final class TaskManager {
                 task.maybeSetError("Unable to find nodes for task: " + e.getMessage());
                 return null;
             }
-            log.info("Running task {} on node(s): {}", task.id, Utils.join(nodeNames, ", "));
+            log.info("Running task {} on node(s): {}", task.id, String.join(", ", nodeNames));
             task.state = TaskStateType.RUNNING;
             task.startedMs = time.milliseconds();
             for (String workerName : nodeNames) {
@@ -448,7 +444,7 @@ public final class TaskManager {
                             nodeManagers.get(entry.getKey()).stopWorker(entry.getValue());
                         }
                         log.info("Cancelling task {} with worker(s) {}",
-                            id, Utils.mkString(activeWorkerIds, "", "", " = ", ", "));
+                            id, Joiner.on(", ").withKeyValueSeparator(" = ").join(activeWorkerIds));
                         task.state = TaskStateType.STOPPING;
                     }
                     break;
@@ -576,11 +572,11 @@ public final class TaskManager {
             task.doneMs = time.milliseconds();
             task.state = TaskStateType.DONE;
             log.info("{}: Task {} is now complete on {} with error: {}",
-                nodeName, task.id, Utils.join(task.workerIds.keySet(), ", "),
+                nodeName, task.id, String.join(", ", task.workerIds.keySet()),
                 task.error.isEmpty() ? "(none)" : task.error);
         } else if ((task.state == TaskStateType.RUNNING) && (!task.error.isEmpty())) {
             log.info("{}: task {} stopped with error {}.  Stopping worker(s): {}",
-                nodeName, task.id, task.error, Utils.mkString(activeWorkerIds, "{", "}", ": ", ", "));
+                nodeName, task.id, task.error, "{" + Joiner.on(", ").withKeyValueSeparator(": ").join(activeWorkerIds) + "}");
             task.state = TaskStateType.STOPPING;
             for (Map.Entry<String, Long> entry : activeWorkerIds.entrySet()) {
                 nodeManagers.get(entry.getKey()).stopWorker(entry.getValue());

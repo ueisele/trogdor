@@ -17,8 +17,8 @@
 
 package org.apache.kafka.trogdor.task;
 
-import org.apache.kafka.common.internals.KafkaFutureImpl;
 import org.apache.kafka.trogdor.common.Platform;
+import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 
 /**
  * The agent-side interface for implementing tasks.

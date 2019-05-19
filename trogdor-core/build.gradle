@@ -33,7 +33,10 @@ dependencies {
     implementation libs.jettyServer
     implementation libs.jettyServlet
     implementation libs.jettyServlets
-
+    
+    implementation libs.guava // To be discussed
+    implementation libs.commons_lang // To be discussed
+    
     testImplementation libs.kafkaClients_22_test
     
     testImplementation libs.junit

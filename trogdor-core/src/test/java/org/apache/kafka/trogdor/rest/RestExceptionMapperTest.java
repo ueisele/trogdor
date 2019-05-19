@@ -20,8 +20,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
-import org.apache.kafka.common.errors.InvalidRequestException;
-import org.apache.kafka.common.errors.SerializationException;
+import org.apache.kafka.trogdor.common.errors.InvalidRequestException;
+import org.apache.kafka.trogdor.common.errors.SerializationException;
 import org.junit.Test;
 
 import javax.ws.rs.NotFoundException;

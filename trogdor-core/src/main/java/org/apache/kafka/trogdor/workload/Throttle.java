@@ -17,7 +17,7 @@
 
 package org.apache.kafka.trogdor.workload;
 
-import org.apache.kafka.common.utils.Time;
+import org.apache.kafka.trogdor.common.utils.Time;
 
 public class Throttle {
     private final int maxPerPeriod;

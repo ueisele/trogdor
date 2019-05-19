@@ -17,14 +17,14 @@
 
 package org.apache.kafka.trogdor.agent;
 
-import org.apache.kafka.common.KafkaException;
-import org.apache.kafka.common.KafkaFuture;
-import org.apache.kafka.common.internals.KafkaFutureImpl;
-import org.apache.kafka.common.utils.Scheduler;
-import org.apache.kafka.common.utils.Time;
-import org.apache.kafka.common.utils.Utils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.kafka.trogdor.common.KafkaFuture;
 import org.apache.kafka.trogdor.common.Platform;
 import org.apache.kafka.trogdor.common.ThreadUtils;
+import org.apache.kafka.trogdor.common.TrogdorException;
+import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
+import org.apache.kafka.trogdor.common.utils.Scheduler;
+import org.apache.kafka.trogdor.common.utils.Time;
 import org.apache.kafka.trogdor.rest.*;
 import org.apache.kafka.trogdor.task.AgentWorkerStatusTracker;
 import org.apache.kafka.trogdor.task.TaskSpec;
@@ -119,7 +119,7 @@ public final class WorkerManager {
 
         synchronized Reference takeReference() {
             if (shutdown) {
-                throw new KafkaException("WorkerManager is shut down.");
+                throw new TrogdorException("WorkerManager is shut down.");
             }
             refCount++;
             return new Reference();
@@ -339,7 +339,7 @@ public final class WorkerManager {
             } catch (Exception e) {
                 log.info("{}: Worker {} start() exception", nodeName, worker, e);
                 stateChangeExecutor.submit(new HandleWorkerHalting(worker,
-                    "worker.start() exception: " + Utils.stackTrace(e), true));
+                    "worker.start() exception: " + ExceptionUtils.getStackTrace(e), true));
             }
             stateChangeExecutor.submit(new FinishCreatingWorker(worker));
             return worker.doneFuture;

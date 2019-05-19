@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.trogdor.common.TrogdorException;
 import org.apache.kafka.trogdor.task.TaskSpec;
 
 /**
@@ -65,7 +65,7 @@ public abstract class WorkerState extends Message {
     }
 
     public long startedMs() {
-        throw new KafkaException("invalid state");
+        throw new TrogdorException("invalid state");
     }
 
     public abstract JsonNode status();

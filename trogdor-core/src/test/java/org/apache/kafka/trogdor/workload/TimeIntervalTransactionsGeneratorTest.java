@@ -17,7 +17,7 @@
 
 package org.apache.kafka.trogdor.workload;
 
-import org.apache.kafka.common.utils.MockTime;
+import org.apache.kafka.trogdor.common.utils.MockTime;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

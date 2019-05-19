@@ -19,12 +19,10 @@ package org.apache.kafka.trogdor.common;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.kafka.test.TestUtils;
+import org.apache.kafka.trogdor.test.TestUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -33,7 +31,6 @@ import java.nio.file.Files;
 import static org.junit.Assert.*;
 
 public class JsonUtilTest {
-    private static final Logger log = LoggerFactory.getLogger(JsonUtilTest.class);
 
     @Rule
     final public Timeout globalTimeout = Timeout.millis(120000);

@@ -24,16 +24,16 @@ ext {
 
 versions += [
   activation: "1.1.1",
-  argparse4j: "0.7.0",
+  argparse4j: "0.8.1",
   commons_lang: "3.9",      
   easymock: "4.0.2",
   guava: "27.1-jre",      
-  jackson: "2.9.8",
-  jetty: "9.4.14.v20181114",
+  jackson: "2.9.9",
+  jetty: "9.4.18.v20190429",
   jersey: "2.28",
   log4j: "1.2.17",
-  jaxb: "2.3.0",
-  junit: "4.13-beta-2",
+  jaxb: "2.3.1",
+  junit: "4.13-beta-3",
   kafka_0100: "0.10.0.1",
   kafka_0101: "0.10.1.1",
   kafka_0102: "0.10.2.2",
@@ -43,8 +43,8 @@ versions += [
   kafka_20: "2.0.1",
   kafka_21: "2.1.1",
   kafka_22: "2.2.0-cp2",      
-  powermock: "2.0.0",
-  slf4j: "1.7.25",
+  powermock: "2.0.2",
+  slf4j: "1.7.26",
 ]
 
 libs += [

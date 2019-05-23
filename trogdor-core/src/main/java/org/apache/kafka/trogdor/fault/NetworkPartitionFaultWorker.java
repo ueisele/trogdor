@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.kafka.trogdor.common.Node;
 import org.apache.kafka.trogdor.common.Platform;
 import org.apache.kafka.trogdor.common.Topology;
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 import org.apache.kafka.trogdor.task.TaskWorker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
 import org.slf4j.Logger;
@@ -31,6 +30,7 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
 
 public class NetworkPartitionFaultWorker implements TaskWorker {
     private static final Logger log = LoggerFactory.getLogger(NetworkPartitionFaultWorker.class);
@@ -48,7 +48,7 @@ public class NetworkPartitionFaultWorker implements TaskWorker {
 
     @Override
     public void start(Platform platform, WorkerStatusTracker status,
-                      KafkaFutureImpl<String> errorFuture) throws Exception {
+                      CompletableFuture<String> errorFuture) throws Exception {
         log.info("Activating NetworkPartitionFault {}.", id);
         this.status = status;
         this.status.update(new TextNode("creating network partition " + id));

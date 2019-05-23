@@ -16,8 +16,6 @@
  */
 package org.apache.kafka.trogdor.common.utils;
 
-import org.apache.kafka.trogdor.common.KafkaFuture;
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -40,7 +39,7 @@ public class MockScheduler implements Scheduler, MockTime.MockTimeListener {
     /**
      * Futures which are waiting for a specified wall-clock time to arrive.
      */
-    private final TreeMap<Long, List<KafkaFutureImpl<Long>>> waiters = new TreeMap<>();
+    private final TreeMap<Long, List<CompletableFuture<Long>>> waiters = new TreeMap<>();
 
     public MockScheduler(MockTime time) {
         this.time = time;
@@ -56,24 +55,24 @@ public class MockScheduler implements Scheduler, MockTime.MockTimeListener {
     public synchronized void tick() {
         long timeMs = time.milliseconds();
         while (true) {
-            Map.Entry<Long, List<KafkaFutureImpl<Long>>> entry = waiters.firstEntry();
+            Map.Entry<Long, List<CompletableFuture<Long>>> entry = waiters.firstEntry();
             if ((entry == null) || (entry.getKey() > timeMs)) {
                 break;
             }
-            for (KafkaFutureImpl<Long> future : entry.getValue()) {
+            for (CompletableFuture<Long> future : entry.getValue()) {
                 future.complete(timeMs);
             }
             waiters.remove(entry.getKey());
         }
     }
 
-    public synchronized void addWaiter(long delayMs, KafkaFutureImpl<Long> waiter) {
+    public synchronized void addWaiter(long delayMs, CompletableFuture<Long> waiter) {
         long timeMs = time.milliseconds();
         if (delayMs <= 0) {
             waiter.complete(timeMs);
         } else {
             long triggerTimeMs = timeMs + delayMs;
-            List<KafkaFutureImpl<Long>> futures = waiters.get(triggerTimeMs);
+            List<CompletableFuture<Long>> futures = waiters.get(triggerTimeMs);
             if (futures == null) {
                 futures = new ArrayList<>();
                 waiters.put(triggerTimeMs, futures);
@@ -85,9 +84,9 @@ public class MockScheduler implements Scheduler, MockTime.MockTimeListener {
     @Override
     public <T> Future<T> schedule(final ScheduledExecutorService executor,
                                   final Callable<T> callable, long delayMs) {
-        final KafkaFutureImpl<T> future = new KafkaFutureImpl<>();
-        KafkaFutureImpl<Long> waiter = new KafkaFutureImpl<>();
-        waiter.thenApply((KafkaFuture.BaseFunction<Long, Void>) now -> {
+        final CompletableFuture<T> future = new CompletableFuture<>();
+        CompletableFuture<Long> waiter = new CompletableFuture<>();
+        waiter.thenApply(now -> {
             executor.submit((Callable<Void>) () -> {
                 // Note: it is possible that we'll execute Callable#call right after
                 // the future is cancelled.  This is a valid sequence of events

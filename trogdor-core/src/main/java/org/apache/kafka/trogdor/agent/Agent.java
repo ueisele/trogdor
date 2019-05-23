@@ -24,7 +24,6 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.kafka.trogdor.common.JsonUtil;
-import org.apache.kafka.trogdor.common.KafkaFuture;
 import org.apache.kafka.trogdor.common.Node;
 import org.apache.kafka.trogdor.common.Platform;
 import org.apache.kafka.trogdor.common.utils.Exit;
@@ -38,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import static net.sourceforge.argparse4j.impl.Arguments.store;
 
@@ -173,7 +173,7 @@ public final class Agent {
                 platform.curNode().name());
             return false;
         }
-        KafkaFuture<String> future = null;
+        CompletableFuture<String> future = null;
         try {
             future = workerManager.createWorker(EXEC_WORKER_ID, EXEC_TASK_ID, spec);
         } catch (Throwable e) {

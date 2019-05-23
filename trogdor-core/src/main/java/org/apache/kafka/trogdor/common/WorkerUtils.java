@@ -17,8 +17,9 @@
 
 package org.apache.kafka.trogdor.common;
 
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 import org.slf4j.Logger;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Utilities for Trogdor TaskWorkers.
@@ -34,7 +35,7 @@ public final class WorkerUtils {
      * @throws TrogdorException   A wrapped version of the exception.
      */
     public static void abort(Logger log, String what, Throwable exception,
-                             KafkaFutureImpl<String> doneFuture) throws TrogdorException {
+                             CompletableFuture<String> doneFuture) throws TrogdorException {
         log.warn("{} caught an exception", what, exception);
         if (exception.getMessage() == null || exception.getMessage().isEmpty()) {
             doneFuture.complete(exception.getClass().getCanonicalName());

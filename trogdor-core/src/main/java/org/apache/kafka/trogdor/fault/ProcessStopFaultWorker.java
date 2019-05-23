@@ -19,7 +19,6 @@ package org.apache.kafka.trogdor.fault;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.kafka.trogdor.common.Platform;
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 import org.apache.kafka.trogdor.task.TaskWorker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
 import org.slf4j.Logger;
@@ -27,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static java.util.stream.Collectors.joining;
 
@@ -46,7 +46,7 @@ public class ProcessStopFaultWorker implements TaskWorker {
 
     @Override
     public void start(Platform platform, WorkerStatusTracker status,
-                      KafkaFutureImpl<String> errorFuture) throws Exception {
+                      CompletableFuture<String> errorFuture) throws Exception {
         this.status = status;
         log.info("Activating ProcessStopFault {}.", id);
         this.status.update(new TextNode("stopping " + javaProcessName));

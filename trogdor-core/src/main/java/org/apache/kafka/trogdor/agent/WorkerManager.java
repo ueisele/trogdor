@@ -18,11 +18,9 @@
 package org.apache.kafka.trogdor.agent;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.kafka.trogdor.common.KafkaFuture;
 import org.apache.kafka.trogdor.common.Platform;
 import org.apache.kafka.trogdor.common.ThreadUtils;
 import org.apache.kafka.trogdor.common.TrogdorException;
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 import org.apache.kafka.trogdor.common.utils.Scheduler;
 import org.apache.kafka.trogdor.common.utils.Time;
 import org.apache.kafka.trogdor.rest.*;
@@ -223,7 +221,7 @@ public final class WorkerManager {
         /**
          * A future which is completed when the task transitions to DONE state.
          */
-        private KafkaFutureImpl<String> doneFuture = null;
+        private CompletableFuture<String> doneFuture = null;
 
         /**
          * A shutdown manager reference which will keep the WorkerManager
@@ -304,7 +302,7 @@ public final class WorkerManager {
         }
     }
 
-    public KafkaFuture<String> createWorker(long workerId, String taskId, TaskSpec spec) throws Throwable {
+    public CompletableFuture<String> createWorker(long workerId, String taskId, TaskSpec spec) throws Throwable {
         try (ShutdownManager.Reference ref = shutdownManager.takeReference()) {
             final Worker worker = stateChangeExecutor.
                 submit(new CreateWorker(workerId, taskId, spec, time.milliseconds())).get();
@@ -313,15 +311,15 @@ public final class WorkerManager {
                     "a worker with that id.", nodeName, workerId);
                 return worker.doneFuture;
             }
-            worker.doneFuture = new KafkaFutureImpl<>();
+            worker.doneFuture = new CompletableFuture<>();
             if (worker.spec.endMs() <= time.milliseconds()) {
                 log.info("{}: Will not run worker {} as it has expired.", nodeName, worker);
                 stateChangeExecutor.submit(new HandleWorkerHalting(worker,
                     "worker expired", true));
                 return worker.doneFuture;
             }
-            KafkaFutureImpl<String> haltFuture = new KafkaFutureImpl<>();
-            haltFuture.thenApply((KafkaFuture.BaseFunction<String, Void>) errorString -> {
+            CompletableFuture<String> haltFuture = new CompletableFuture<>();
+            haltFuture.thenApply(errorString -> {
                 if (errorString == null)
                     errorString = "";
                 if (errorString.isEmpty()) {

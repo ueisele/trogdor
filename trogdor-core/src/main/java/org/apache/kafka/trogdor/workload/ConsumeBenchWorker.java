@@ -28,7 +28,6 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.trogdor.common.*;
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 import org.apache.kafka.trogdor.common.utils.Time;
 import org.apache.kafka.trogdor.common.utils.Utils;
 import org.apache.kafka.trogdor.task.TaskWorker;
@@ -56,7 +55,7 @@ public class ConsumeBenchWorker implements TaskWorker {
     private WorkerStatusTracker workerStatus;
     private StatusUpdater statusUpdater;
     private Future<?> statusUpdaterFuture;
-    private KafkaFutureImpl<String> doneFuture;
+    private CompletableFuture<String> doneFuture;
     private ThreadSafeConsumer consumer;
     public ConsumeBenchWorker(String id, ConsumeBenchSpec spec) {
         this.id = id;
@@ -65,7 +64,7 @@ public class ConsumeBenchWorker implements TaskWorker {
 
     @Override
     public void start(Platform platform, WorkerStatusTracker status,
-                      KafkaFutureImpl<String> doneFuture) throws Exception {
+                      CompletableFuture<String> doneFuture) throws Exception {
         if (!running.compareAndSet(false, true)) {
             throw new IllegalStateException("ConsumeBenchWorker is already running.");
         }

@@ -17,12 +17,10 @@
 
 package org.apache.kafka.trogdor.workload;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 import org.apache.kafka.trogdor.common.utils.OperatingSystem;
 import org.apache.kafka.trogdor.task.AgentWorkerStatusTracker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
@@ -88,7 +86,7 @@ public class ExternalCommandWorkerTest {
         if (OperatingSystem.IS_WINDOWS) return;
         ExternalCommandWorker worker =
             new ExternalCommandWorkerBuilder("trueTask").command("true").build();
-        KafkaFutureImpl<String> doneFuture = new KafkaFutureImpl<>();
+        CompletableFuture<String> doneFuture = new CompletableFuture<>();
         worker.start(null, new AgentWorkerStatusTracker(), doneFuture);
         assertEquals("", doneFuture.get());
         worker.stop(null);
@@ -102,7 +100,7 @@ public class ExternalCommandWorkerTest {
         if (OperatingSystem.IS_WINDOWS) return;
         ExternalCommandWorker worker =
             new ExternalCommandWorkerBuilder("falseTask").command("false").build();
-        KafkaFutureImpl<String> doneFuture = new KafkaFutureImpl<>();
+        CompletableFuture<String> doneFuture = new CompletableFuture<>();
         worker.start(null, new AgentWorkerStatusTracker(), doneFuture);
         assertEquals("exited with return code 1", doneFuture.get());
         worker.stop(null);
@@ -118,7 +116,7 @@ public class ExternalCommandWorkerTest {
         ExternalCommandWorker worker =
             new ExternalCommandWorkerBuilder("notFoundTask").
                 command("/dev/null/non/existent/script/path").build();
-        KafkaFutureImpl<String> doneFuture = new KafkaFutureImpl<>();
+        CompletableFuture<String> doneFuture = new CompletableFuture<>();
         worker.start(null, new AgentWorkerStatusTracker(), doneFuture);
         String errorString = doneFuture.get();
         assertTrue(errorString.startsWith("Unable to start process"));
@@ -134,7 +132,7 @@ public class ExternalCommandWorkerTest {
         ExternalCommandWorker worker =
             new ExternalCommandWorkerBuilder("testStopTask").
                 command("sleep", "3600000").build();
-        KafkaFutureImpl<String> doneFuture = new KafkaFutureImpl<>();
+        CompletableFuture<String> doneFuture = new CompletableFuture<>();
         worker.start(null, new AgentWorkerStatusTracker(), doneFuture);
         worker.stop(null);
         // We don't check the numeric return code, since that will vary based on
@@ -172,17 +170,12 @@ public class ExternalCommandWorkerTest {
                 }
             }
             CompletableFuture<String> statusFuture = new CompletableFuture<>();
-            final WorkerStatusTracker statusTracker = new WorkerStatusTracker() {
-                @Override
-                public void update(JsonNode status) {
-                    statusFuture .complete(status.textValue().toString());
-                }
-            };
+            final WorkerStatusTracker statusTracker = status -> statusFuture .complete(status.textValue().toString());
             ExternalCommandWorker worker = new ExternalCommandWorkerBuilder("testForceKillTask").
                 shutdownGracePeriodMs(1).
                 command("bash", tempFile.getAbsolutePath()).
                 build();
-            KafkaFutureImpl<String> doneFuture = new KafkaFutureImpl<>();
+            CompletableFuture<String> doneFuture = new CompletableFuture<>();
             worker.start(null, statusTracker, doneFuture);
             assertEquals("green", statusFuture.get());
             worker.stop(null);

@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.kafka.trogdor.common.JsonUtil;
 import org.apache.kafka.trogdor.common.Platform;
 import org.apache.kafka.trogdor.common.ThreadUtils;
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 import org.apache.kafka.trogdor.task.TaskWorker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
 import org.slf4j.Logger;
@@ -115,7 +114,7 @@ public class ExternalCommandWorker implements TaskWorker {
     /**
      * A future which should be completed when this worker is done.
      */
-    private KafkaFutureImpl<String> doneFuture;
+    private CompletableFuture<String> doneFuture;
 
     /**
      * The executor service for this worker.
@@ -129,7 +128,7 @@ public class ExternalCommandWorker implements TaskWorker {
 
     @Override
     public void start(Platform platform, WorkerStatusTracker status,
-                      KafkaFutureImpl<String> doneFuture) throws Exception {
+                      CompletableFuture<String> doneFuture) throws Exception {
         if (!running.compareAndSet(false, true)) {
             throw new IllegalStateException("ConsumeBenchWorker is already running.");
         }

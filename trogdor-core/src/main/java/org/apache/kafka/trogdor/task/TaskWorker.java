@@ -18,7 +18,8 @@
 package org.apache.kafka.trogdor.task;
 
 import org.apache.kafka.trogdor.common.Platform;
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The agent-side interface for implementing tasks.
@@ -51,7 +52,7 @@ public interface TaskWorker {
      *
      * @throws Exception        If the TaskWorker failed to start.  stop() will not be invoked.
      */
-    void start(Platform platform, WorkerStatusTracker status, KafkaFutureImpl<String> haltFuture)
+    void start(Platform platform, WorkerStatusTracker status, CompletableFuture<String> haltFuture)
         throws Exception;
 
     /**

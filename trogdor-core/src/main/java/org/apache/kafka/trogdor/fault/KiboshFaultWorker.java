@@ -19,12 +19,13 @@ package org.apache.kafka.trogdor.fault;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.kafka.trogdor.common.Platform;
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 import org.apache.kafka.trogdor.fault.Kibosh.KiboshFaultSpec;
 import org.apache.kafka.trogdor.task.TaskWorker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.CompletableFuture;
 
 public class KiboshFaultWorker implements TaskWorker {
     private static final Logger log = LoggerFactory.getLogger(KiboshFaultWorker.class);
@@ -45,7 +46,7 @@ public class KiboshFaultWorker implements TaskWorker {
 
     @Override
     public void start(Platform platform, WorkerStatusTracker status,
-                      KafkaFutureImpl<String> errorFuture) throws Exception {
+                      CompletableFuture<String> errorFuture) throws Exception {
         log.info("Activating {} {}: {}.", spec.getClass().getSimpleName(), id, spec);
         this.status = status;
         this.status.update(new TextNode("Adding fault " + id));

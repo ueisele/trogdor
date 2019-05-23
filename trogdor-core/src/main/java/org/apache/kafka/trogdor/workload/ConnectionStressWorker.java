@@ -32,7 +32,6 @@ import org.apache.kafka.common.network.Selector;
 import org.apache.kafka.common.utils.LogContext;
 import org.apache.kafka.common.utils.Time;
 import org.apache.kafka.trogdor.common.*;
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 import org.apache.kafka.trogdor.common.utils.Utils;
 import org.apache.kafka.trogdor.task.TaskWorker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
@@ -60,7 +59,7 @@ public class ConnectionStressWorker implements TaskWorker {
 
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-    private KafkaFutureImpl<String> doneFuture;
+    private CompletableFuture<String> doneFuture;
 
     private WorkerStatusTracker status;
 
@@ -83,7 +82,7 @@ public class ConnectionStressWorker implements TaskWorker {
 
     @Override
     public void start(Platform platform, WorkerStatusTracker status,
-                      KafkaFutureImpl<String> doneFuture) throws Exception {
+                      CompletableFuture<String> doneFuture) throws Exception {
         if (!running.compareAndSet(false, true)) {
             throw new IllegalStateException("ConnectionStressWorker is already running.");
         }

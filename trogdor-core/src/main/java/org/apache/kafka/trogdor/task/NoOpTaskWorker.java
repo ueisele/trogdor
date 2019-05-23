@@ -19,9 +19,10 @@ package org.apache.kafka.trogdor.task;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.kafka.trogdor.common.Platform;
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.CompletableFuture;
 
 public class NoOpTaskWorker implements TaskWorker {
     private static final Logger log = LoggerFactory.getLogger(NoOpTaskWorker.class);
@@ -36,7 +37,7 @@ public class NoOpTaskWorker implements TaskWorker {
 
     @Override
     public void start(Platform platform, WorkerStatusTracker status,
-                      KafkaFutureImpl<String> errorFuture) throws Exception {
+                      CompletableFuture<String> errorFuture) throws Exception {
         log.info("{}: Activating NoOpTask.", id);
         this.status = status;
         this.status.update(new TextNode("active"));

@@ -25,7 +25,6 @@ import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.trogdor.common.*;
-import org.apache.kafka.trogdor.common.internals.KafkaFutureImpl;
 import org.apache.kafka.trogdor.common.utils.Time;
 import org.apache.kafka.trogdor.task.TaskWorker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
@@ -53,7 +52,7 @@ public class ProduceBenchWorker implements TaskWorker {
 
     private WorkerStatusTracker status;
 
-    private KafkaFutureImpl<String> doneFuture;
+    private CompletableFuture<String> doneFuture;
 
     public ProduceBenchWorker(String id, ProduceBenchSpec spec) {
         this.id = id;
@@ -62,7 +61,7 @@ public class ProduceBenchWorker implements TaskWorker {
 
     @Override
     public void start(Platform platform, WorkerStatusTracker status,
-                      KafkaFutureImpl<String> doneFuture) throws Exception {
+                      CompletableFuture<String> doneFuture) throws Exception {
         if (!running.compareAndSet(false, true)) {
             throw new IllegalStateException("ProducerBenchWorker is already running.");
         }

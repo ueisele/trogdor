@@ -34,9 +34,9 @@ import org.apache.kafka.common.errors.TimeoutException;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
+import org.apache.kafka.common.utils.Time;
+import org.apache.kafka.common.utils.Utils;
 import org.apache.kafka.trogdor.common.*;
-import org.apache.kafka.trogdor.common.utils.Time;
-import org.apache.kafka.trogdor.common.utils.Utils;
 import org.apache.kafka.trogdor.task.TaskWorker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
 import org.slf4j.Logger;
@@ -54,8 +54,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static java.util.stream.Collectors.joining;
 
 public class RoundTripWorker implements TaskWorker {
     private static final int THROTTLE_PERIOD_MS = 100;
@@ -107,7 +105,7 @@ public class RoundTripWorker implements TaskWorker {
         }
         log.info("{}: Activating RoundTripWorker.", id);
         this.executor = Executors.newScheduledThreadPool(3,
-            ThreadUtils.createThreadFactory("RoundTripWorker%d", false));
+                ThreadUtils.createThreadFactory("RoundTripWorker%d", false));
         this.status = status;
         this.doneFuture = doneFuture;
         this.producer = null;
@@ -126,7 +124,7 @@ public class RoundTripWorker implements TaskWorker {
                 Map<String, NewTopic> newTopics = new HashMap<>();
                 HashSet<TopicPartition> active = new HashSet<>();
                 for (Map.Entry<String, PartitionsSpec> entry :
-                    spec.activeTopics().materialize().entrySet()) {
+                        spec.activeTopics().materialize().entrySet()) {
                     String topicName = entry.getKey();
                     PartitionsSpec partSpec = entry.getValue();
                     newTopics.put(topicName, partSpec.newTopic(topicName));
@@ -139,7 +137,7 @@ public class RoundTripWorker implements TaskWorker {
                 }
                 status.update(new TextNode("Creating " + newTopics.keySet().size() + " topic(s)"));
                 KafkaWorkerUtils.createTopics(log, spec.bootstrapServers(), spec.commonClientConf(),
-                    spec.adminClientConf(), newTopics, true);
+                        spec.adminClientConf(), newTopics, true);
                 status.update(new TextNode("Created " + newTopics.keySet().size() + " topic(s)"));
                 toSendTracker = new ToSendTracker(spec.maxMessages());
                 toReceiveTracker = new ToReceiveTracker();
@@ -147,7 +145,7 @@ public class RoundTripWorker implements TaskWorker {
                 executor.submit(new ConsumerRunnable(active));
                 executor.submit(new StatusUpdater());
                 executor.scheduleWithFixedDelay(
-                    new StatusUpdater(), 30, 30, TimeUnit.SECONDS);
+                        new StatusUpdater(), 30, 30, TimeUnit.SECONDS);
             } catch (Throwable e) {
                 WorkerUtils.abort(log, "Prepare", e, doneFuture);
             }
@@ -211,9 +209,9 @@ public class RoundTripWorker implements TaskWorker {
             // user may over-write the defaults with common client config and producer config
             KafkaWorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.producerConf());
             producer = new KafkaProducer<>(props, new ByteArraySerializer(),
-                new ByteArraySerializer());
+                    new ByteArraySerializer());
             int perPeriod = WorkerUtils.
-                perSecToPerPeriod(spec.targetMessagesPerSec(), THROTTLE_PERIOD_MS);
+                    perSecToPerPeriod(spec.targetMessagesPerSec(), THROTTLE_PERIOD_MS);
             this.throttle = new Throttle(perPeriod, THROTTLE_PERIOD_MS);
         }
 
@@ -242,8 +240,8 @@ public class RoundTripWorker implements TaskWorker {
                     TopicPartition partition = iter.next();
                     // we explicitly specify generator position based on message index
                     ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(partition.topic(),
-                        partition.partition(), KEY_GENERATOR.generate(messageIndex),
-                        spec.valueGenerator().generate(messageIndex));
+                            partition.partition(), KEY_GENERATOR.generate(messageIndex),
+                            spec.valueGenerator().generate(messageIndex));
                     producer.send(record, (metadata, exception) -> {
                         if (exception == null) {
                             try {
@@ -256,7 +254,7 @@ public class RoundTripWorker implements TaskWorker {
                             }
                         } else {
                             log.info("{}: Got exception when sending message {}: {}",
-                                id, messageIndex, exception.getMessage());
+                                    id, messageIndex, exception.getMessage());
                             toSendTracker.addFailed(messageIndex);
                         }
                     });
@@ -310,7 +308,7 @@ public class RoundTripWorker implements TaskWorker {
                 }
             }
             log.info("{}: consumer waiting for {} message(s), starting with: {}",
-                id, numToReceive, list.stream().map(String::valueOf).collect(joining(", ")));
+                    id, numToReceive, Utils.join(list, ", "));
         }
     }
 
@@ -328,7 +326,7 @@ public class RoundTripWorker implements TaskWorker {
             // user may over-write the defaults with common client config and consumer config
             KafkaWorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.consumerConf());
             consumer = new KafkaConsumer<>(props, new ByteArrayDeserializer(),
-                new ByteArrayDeserializer());
+                    new ByteArrayDeserializer());
             consumer.assign(partitions);
         }
 
@@ -354,7 +352,7 @@ public class RoundTripWorker implements TaskWorker {
                                     try {
                                         lock.lock();
                                         log.info("{}: Consumer received the full count of {} unique messages.  " +
-                                            "Waiting for all {} sends to be acked...", id, spec.maxMessages(), unackedSends);
+                                                "Waiting for all {} sends to be acked...", id, spec.maxMessages(), unackedSends);
                                         while (unackedSends > 0)
                                             unackedSendsAreZero.await();
                                     } finally {
@@ -377,16 +375,14 @@ public class RoundTripWorker implements TaskWorker {
                         log.debug("{}: Consumer got WakeupException", id, e);
                     } catch (TimeoutException e) {
                         log.debug("{}: Consumer got TimeoutException", id, e);
-                    } finally {
-                        lock.unlock();
                     }
                 }
             } catch (Throwable e) {
                 WorkerUtils.abort(log, "ConsumerRunnable", e, doneFuture);
             } finally {
                 log.info("{}: ConsumerRunnable is exiting.  Invoked poll {} time(s).  " +
-                    "messagesReceived = {}; uniqueMessagesReceived = {}.",
-                    id, pollInvoked, messagesReceived, uniqueMessagesReceived);
+                                "messagesReceived = {}; uniqueMessagesReceived = {}.",
+                        id, pollInvoked, messagesReceived, uniqueMessagesReceived);
             }
         }
     }
@@ -403,7 +399,7 @@ public class RoundTripWorker implements TaskWorker {
 
         StatusData update() {
             StatusData statusData =
-                new StatusData(toSendTracker.frontier(), toReceiveTracker.totalReceived());
+                    new StatusData(toSendTracker.frontier(), toReceiveTracker.totalReceived());
             status.update(JsonUtil.JSON_SERDE.valueToTree(statusData));
             return statusData;
         }

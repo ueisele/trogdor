@@ -66,7 +66,7 @@ public class JsonRestServer {
      */
     public JsonRestServer(int port) {
         this.shutdownExecutor = Executors.newSingleThreadScheduledExecutor(
-            ThreadUtils.createThreadFactory("JsonRestServerCleanupExecutor", false));
+                ThreadUtils.createThreadFactory("JsonRestServerCleanupExecutor", false));
         this.jettyServer = new Server();
         this.connector = new ServerConnector(jettyServer);
         if (port > 0) {
@@ -96,9 +96,9 @@ public class JsonRestServer {
         context.addServlet(servletHolder, "/*");
 
         RequestLogHandler requestLogHandler = new RequestLogHandler();
-        Slf4jRequestLog requestLog = new Slf4jRequestLog();
-        requestLog.setLoggerName(JsonRestServer.class.getCanonicalName());
-        requestLog.setLogLatency(true);
+        Slf4jRequestLogWriter slf4jRequestLogWriter = new Slf4jRequestLogWriter();
+        slf4jRequestLogWriter.setLoggerName(JsonRestServer.class.getCanonicalName());
+        CustomRequestLog requestLog = new CustomRequestLog(slf4jRequestLogWriter, CustomRequestLog.EXTENDED_NCSA_FORMAT + " %msT");
         requestLogHandler.setRequestLog(requestLog);
 
         HandlerCollection handlers = new HandlerCollection();
@@ -156,21 +156,6 @@ public class JsonRestServer {
     /**
      * Make an HTTP request.
      *
-     * @param url               HTTP connection will be established with this url.
-     * @param method            HTTP method ("GET", "POST", "PUT", etc.)
-     * @param requestBodyData   Object to serialize as JSON and send in the request body.
-     * @param responseFormat    Expected format of the response to the HTTP request.
-     * @param <T>               The type of the deserialized response to the HTTP request.
-     * @return The deserialized response to the HTTP request, or null if no data is expected.
-     */
-    public static <T> HttpResponse<T> httpRequest(String url, String method, Object requestBodyData,
-                                                  TypeReference<T> responseFormat) throws IOException {
-        return httpRequest(log, url, method, requestBodyData, responseFormat);
-    }
-
-    /**
-     * Make an HTTP request.
-     *
      * @param logger            The logger to use.
      * @param url               HTTP connection will be established with this url.
      * @param method            HTTP method ("GET", "POST", "PUT", etc.)
@@ -184,11 +169,11 @@ public class JsonRestServer {
         HttpURLConnection connection = null;
         try {
             String serializedBody = requestBodyData == null ? null :
-                JsonUtil.JSON_SERDE.writeValueAsString(requestBodyData);
+                    JsonUtil.JSON_SERDE.writeValueAsString(requestBodyData);
             logger.debug("Sending {} with input {} to {}", method, serializedBody, url);
             connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod(method);
-            connection.setRequestProperty("User-Agent", "org/apache/kafka");
+            connection.setRequestProperty("User-Agent", "kafka");
             connection.setRequestProperty("Accept", "application/json");
 
             // connection.getResponseCode() implicitly calls getInputStream, so always set

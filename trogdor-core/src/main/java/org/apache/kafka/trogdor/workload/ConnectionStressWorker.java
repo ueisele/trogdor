@@ -31,8 +31,8 @@ import org.apache.kafka.common.network.ChannelBuilder;
 import org.apache.kafka.common.network.Selector;
 import org.apache.kafka.common.utils.LogContext;
 import org.apache.kafka.common.utils.Time;
+import org.apache.kafka.common.utils.Utils;
 import org.apache.kafka.trogdor.common.*;
-import org.apache.kafka.trogdor.common.utils.Utils;
 import org.apache.kafka.trogdor.task.TaskWorker;
 import org.apache.kafka.trogdor.task.WorkerStatusTracker;
 import org.slf4j.Logger;
@@ -95,11 +95,11 @@ public class ConnectionStressWorker implements TaskWorker {
             this.startTimeMs = TIME.milliseconds();
         }
         this.statusUpdaterExecutor = Executors.newScheduledThreadPool(1,
-            ThreadUtils.createThreadFactory("StatusUpdaterWorkerThread%d", false));
+                ThreadUtils.createThreadFactory("StatusUpdaterWorkerThread%d", false));
         this.statusUpdaterFuture = this.statusUpdaterExecutor.scheduleAtFixedRate(
-            new StatusUpdater(), 0, REPORT_INTERVAL_MS, TimeUnit.MILLISECONDS);
+                new StatusUpdater(), 0, REPORT_INTERVAL_MS, TimeUnit.MILLISECONDS);
         this.workerExecutor = Executors.newFixedThreadPool(spec.numThreads(),
-            ThreadUtils.createThreadFactory("ConnectionStressWorkerThread%d", false));
+                ThreadUtils.createThreadFactory("ConnectionStressWorkerThread%d", false));
         for (int i = 0; i < spec.numThreads(); i++) {
             this.workerExecutor.submit(new ConnectLoop());
         }
@@ -136,8 +136,8 @@ public class ConnectionStressWorker implements TaskWorker {
             KafkaWorkerUtils.addConfigsToProperties(props, spec.commonClientConf(), spec.commonClientConf());
             this.conf = new AdminClientConfig(props);
             List<InetSocketAddress> addresses = ClientUtils.parseAndValidateAddresses(
-                conf.getList(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG),
-                conf.getString(AdminClientConfig.CLIENT_DNS_LOOKUP_CONFIG));
+                    conf.getList(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG),
+                    conf.getString(AdminClientConfig.CLIENT_DNS_LOOKUP_CONFIG));
             this.updater = new ManualMetadataUpdater(Cluster.bootstrap(addresses).nodes());
             this.channelBuilder = ClientUtils.createChannelBuilder(conf, TIME);
         }
@@ -150,21 +150,21 @@ public class ConnectionStressWorker implements TaskWorker {
                 try (Metrics metrics = new Metrics()) {
                     LogContext logContext = new LogContext();
                     try (Selector selector = new Selector(conf.getLong(AdminClientConfig.CONNECTIONS_MAX_IDLE_MS_CONFIG),
-                        metrics, TIME, "", channelBuilder, logContext)) {
+                            metrics, TIME, "", channelBuilder, logContext)) {
                         try (NetworkClient client = new NetworkClient(selector,
-                            updater,
-                            "ConnectionStressWorker",
-                            1,
-                            1000,
-                            1000,
-                            4096,
-                            4096,
-                            1000,
-                            ClientDnsLookup.forConfig(conf.getString(AdminClientConfig.CLIENT_DNS_LOOKUP_CONFIG)),
-                            TIME,
-                            false,
-                            new ApiVersions(),
-                            logContext)) {
+                                updater,
+                                "ConnectionStressWorker",
+                                1,
+                                1000,
+                                1000,
+                                4096,
+                                4096,
+                                1000,
+                                ClientDnsLookup.forConfig(conf.getString(AdminClientConfig.CLIENT_DNS_LOOKUP_CONFIG)),
+                                TIME,
+                                false,
+                                new ApiVersions(),
+                                logContext)) {
                             NetworkClientUtils.awaitReady(client, targetNode, TIME, 100);
                         }
                     }
@@ -213,8 +213,8 @@ public class ConnectionStressWorker implements TaskWorker {
         public void run() {
             Stressor stressor = Stressor.fromSpec(spec);
             int rate = WorkerUtils.perSecToPerPeriod(
-                ((float) spec.targetConnectionsPerSec()) / spec.numThreads(),
-                THROTTLE_PERIOD_MS);
+                    ((float) spec.targetConnectionsPerSec()) / spec.numThreads(),
+                    THROTTLE_PERIOD_MS);
             Throttle throttle = new ConnectStressThrottle(rate);
             try {
                 while (!doneFuture.isDone()) {
@@ -243,8 +243,8 @@ public class ConnectionStressWorker implements TaskWorker {
                 JsonNode node = null;
                 synchronized (ConnectionStressWorker.this) {
                     node = JsonUtil.JSON_SERDE.valueToTree(
-                        new StatusData(totalConnections, totalFailedConnections,
-                            (totalConnections * 1000.0) / (lastTimeMs - startTimeMs)));
+                            new StatusData(totalConnections, totalFailedConnections,
+                                    (totalConnections * 1000.0) / (lastTimeMs - startTimeMs)));
                 }
                 status.update(node);
             } catch (Exception e) {
@@ -295,6 +295,7 @@ public class ConnectionStressWorker implements TaskWorker {
         // Otherwise, if some threads take a while to terminate, this could lead
         // to a misleading rate getting reported.
         this.statusUpdaterFuture.cancel(false);
+        this.statusUpdaterExecutor.shutdown();
         this.statusUpdaterExecutor.awaitTermination(1, TimeUnit.DAYS);
         this.statusUpdaterExecutor = null;
         new StatusUpdater().run();

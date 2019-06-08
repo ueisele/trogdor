@@ -45,6 +45,22 @@ WORKDIR /home/${USER_NAME}
 RUN echo ${USER_NAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER_NAME} \
     && chmod 0440 /etc/sudoers.d/${USER_NAME}
 
+# Install and configure gpg2
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+    && apt-get -y install --no-install-recommends gnupg2 2>&1 \
+    && apt-get autoremove -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
+ENV DEBIAN_FRONTEND=dialog
+RUN set -o errexit -o nounset \
+    && echo "Adding /run/user/${USER_ID}/" \
+    && mkdir -p /run/user/${USER_ID} \
+    && chown --recursive ${USER_NAME}:${USER_NAME} /run/user/${USER_ID} && chmod 700 /run/user/${USER_ID} \
+    && echo "Adding /home/${USER_NAME}/.gnupg/" \
+    && mkdir -p /home/${USER_NAME}/.gnupg \
+    && chown --recursive ${USER_NAME}:${USER_NAME} /home/${USER_NAME}/.gnupg && chmod 700 /home/${USER_NAME}/.gnupg
+
 # Activate dev user
 USER ${USER_NAME}
 ENV HOME /home/${USER_NAME}

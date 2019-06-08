@@ -99,3 +99,7 @@ RUN set -o errexit -o nounset \
     \
     && echo "Testing Gradle installation" \
     && gradle --version
+
+# Add git provider to known hosts
+ARG GIT_PROVIDER=github.com
+RUN ssh-keyscan -H ${GIT_PROVIDER} >> /home/${USER_NAME}/.ssh/known_hosts

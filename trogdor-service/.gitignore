@@ -79,7 +79,7 @@ fabric.properties
 
 # Visual Studio Code
 bin/
-.settings
+.settings/
 .classpath
 .project
-.vscode
+.vscode/settings.json

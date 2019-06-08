@@ -11,9 +11,12 @@ ENV SHELL /bin/bash
 RUN if [ ! -d "/docker-java-home" ]; then ln -s "${JAVA_HOME}" /docker-java-home; fi
 
 # Verify git, needed tools installed
+# Unminimize makes man pages available (see https://github.com/tianon/docker-brew-ubuntu-core/issues/122)
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update \
+RUN yes | unminimize \
+    && apt-get update \
     && apt-get -y install --no-install-recommends \
+        man-db \
         sudo \
         apt-utils \
         fontconfig \

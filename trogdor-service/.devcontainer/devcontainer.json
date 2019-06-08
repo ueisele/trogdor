@@ -1,0 +1,26 @@
+// See https://aka.ms/vscode-remote/devcontainer.json for format details.
+{
+	"name": "Trogdor Service",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "trogdor-service",
+	"workspaceFolder": "/workspace/trogdor-service",
+
+	// Uncomment the next line if you want to publish any ports.
+	// "appPort": [],
+
+	// Uncomment the next line to run commands after the container is created.
+	// "postCreateCommand": "java -version",
+
+	"extensions": [
+		"vscjava.vscode-java-pack",
+
+		"joaompinto.asciidoctor-vscode",
+		"streetsidesoftware.code-spell-checker",
+
+		"eamodio.gitlens",
+		"donjayamanne.githistory"
+	],
+	"settings": {
+		"java.home": "/docker-java-home"
+	}
+}

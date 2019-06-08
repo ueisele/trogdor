@@ -1,0 +1,18 @@
+= Trogdor Ducktape Services
+
+This directory contains Ducktape services for Trogdor.
+[ducktape](https://github.com/confluentinc/ducktape) is a distributed testing framework 
+which provides test runner, result reporter and utilities to pull up and tear down services.
+
+== Unit Tests
+
+Where are the unit tests?
+* The unit tests are located under the `test` directory.
+
+How do I run the unit tests?
+* python setup.py test
+
+How can I add a unit test?
+* Follow the naming conventions - module name starts with "check", class name begins with "Check", test method name begins with "check"
+* These naming conventions are defined in "setup.cfg". We use "check" to distinguish unit tests from system tests, which use "test" in the various names.
+

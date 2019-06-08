@@ -1,0 +1,25 @@
+// See https://aka.ms/vscode-remote/devcontainer.json for format details.
+{
+	"name": "Trogdor",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "trogdor",
+	"workspaceFolder": "/workspace",
+
+	// Uncomment the next line if you want to keep your containers running after VS Code shuts down.
+	// "shutdownAction": "none",
+
+	// Uncomment the next line to run commands after the container is created.
+	// "postCreateCommand": "docker --version"
+
+	"extensions": [
+		"peterjausovec.vscode-docker",
+
+		"joaompinto.asciidoctor-vscode",
+		"streetsidesoftware.code-spell-checker"
+	],
+	"settings": {
+		"remote.extensionKind": {
+			"peterjausovec.vscode-docker": "workspace"
+		}
+	}
+}

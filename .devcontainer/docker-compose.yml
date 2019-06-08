@@ -1,0 +1,11 @@
+version: '3'
+services:
+  trogdor:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspace
+      - ~/.gitconfig:/root/.gitconfig
+      - /var/run/docker.sock:/var/run/docker.sock 
+    command: sleep infinity

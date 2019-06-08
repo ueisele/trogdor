@@ -1,0 +1,17 @@
+version: '3'
+services:
+  trogdor-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/workspace
+      - ~/.gitconfig:/root/.gitconfig
+      - gradle_caches:/home/dev/.gradle/caches
+      - gradle_wrapper:/home/dev/.gradle/wrapper
+    #  - gradle:/home/gradle/.gradle
+    command: sleep infinity    
+
+volumes:
+  gradle_caches:
+  gradle_wrapper:

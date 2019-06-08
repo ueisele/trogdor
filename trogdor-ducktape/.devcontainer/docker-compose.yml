@@ -1,0 +1,10 @@
+version: '3'
+services:
+  trogdor-ducktape:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspace
+      - ~/.gitconfig:/root/.gitconfig
+    command: sleep infinity    

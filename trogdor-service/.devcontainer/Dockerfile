@@ -4,9 +4,6 @@ ENV GRADLE_VERSION 5.4.1
 ARG GRADLE_DOWNLOAD_SHA256=7bdbad1e4f54f13c8a78abc00c26d44dd8709d4aedb704d913fb1bb78ac025dc
 ARG GRADLE_DOWNLOAD_URL="https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
 
-# Set the default shell to bash instead of sh
-ENV SHELL /bin/bash
-
 # Allow for a consistant java home location for settings - image is changing over time
 RUN if [ ! -d "/docker-java-home" ]; then ln -s "${JAVA_HOME}" /docker-java-home; fi
 
@@ -17,6 +14,7 @@ RUN yes | unminimize \
     && apt-get update \
     && apt-get -y install --no-install-recommends \
         man-db \
+        zsh \
         sudo \
         apt-utils \
         fontconfig \
@@ -32,6 +30,9 @@ RUN yes | unminimize \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 ENV DEBIAN_FRONTEND=dialog
+
+# Set the default shell to zsh instead of sh
+ENV SHELL /usr/bin/zsh
 
 # Create dev user
 ARG USER_NAME="dev"
@@ -69,6 +70,11 @@ RUN set -o errexit -o nounset \
 USER ${USER_NAME}
 ENV HOME /home/${USER_NAME}
 ENV PATH="/home/${USER_NAME}/.local/bin:${PATH}"
+
+# Install and configure Oh-My-Zsh
+ARG ZSH_THEME=blinks
+RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh \
+    && sed -r -i "s/(ZSH_THEME=\")([^\"]+)(\")/\1${ZSH_THEME}\3/" /home/${USER_NAME}/.zshrc
 
 # Install Gradle
 ENV GRADLE_HOME /home/${USER_NAME}/.gradle

@@ -20,6 +20,7 @@ RUN yes | unminimize \
         sudo \
         apt-utils \
         fontconfig \
+        vim \
         unzip \
         bzr \
         curl \

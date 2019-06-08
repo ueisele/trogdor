@@ -18,7 +18,8 @@
 		"streetsidesoftware.code-spell-checker",
 
 		"eamodio.gitlens",
-		"donjayamanne.githistory"
+		"mhutchie.git-graph",
+		"fabiospampinato.vscode-git-history"
 	],
 	"settings": {
 		"java.home": "/docker-java-home"

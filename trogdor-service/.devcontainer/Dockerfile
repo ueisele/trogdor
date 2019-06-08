@@ -61,5 +61,8 @@ RUN set -o errexit -o nounset \
     && ln --symbolic "${GRADLE_HOME}/bin/gradle" /home/${USER_NAME}/.local/bin/gradle \
     && mkdir -p "${GRADLE_HOME}/caches" && mkdir -p "${GRADLE_HOME}/wrapper" \
     \
+    && echo "Configuring Gradle" \
+    && echo "org.gradle.jvmargs=-Dfile.encoding=UTF-8" >> "${GRADLE_HOME}/gradle.properties" \
+    \
     && echo "Testing Gradle installation" \
     && gradle --version

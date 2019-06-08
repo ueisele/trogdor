@@ -23,7 +23,7 @@ import org.gradle.api.tasks.bundling.Compression
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 
-import java.nio.charset.StandardCharsets
+import static java.nio.charset.StandardCharsets.UTF_8
 
 buildscript {
     repositories {
@@ -114,7 +114,7 @@ subprojects {
     targetCompatibility = minJavaVersion
 
     tasks.withType(JavaCompile) {
-        options.encoding = 'UTF-8'
+        options.encoding = UTF_8
     }
 
     dependencies {

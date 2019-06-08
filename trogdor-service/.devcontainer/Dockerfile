@@ -24,6 +24,7 @@ RUN yes | unminimize \
         curl \
         wget \
         openssh-client \
+        ssh-askpass \
         git \
         procps 2>&1 \
     && apt-get autoremove -y \
@@ -43,6 +44,7 @@ RUN set -o errexit -o nounset \
     && groupadd --system --gid ${GROUP_ID} ${USER_NAME} \
     && useradd --system --gid ${USER_NAME} --uid ${USER_ID} --shell /bin/bash --create-home ${USER_NAME} \
     && mkdir -p /home/${USER_NAME}/.local/bin \
+    && mkdir -p /home/${USER_NAME}/.ssh \
     && chown --recursive ${USER_NAME}:${USER_NAME} /home/${USER_NAME}
 WORKDIR /home/${USER_NAME}
 

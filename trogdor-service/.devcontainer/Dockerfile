@@ -14,6 +14,7 @@ RUN if [ ! -d "/docker-java-home" ]; then ln -s "${JAVA_HOME}" /docker-java-home
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get -y install --no-install-recommends \
+        sudo \
         apt-utils \
         fontconfig \
         unzip \
@@ -39,6 +40,10 @@ RUN set -o errexit -o nounset \
     && mkdir -p /home/${USER_NAME}/.local/bin \
     && chown --recursive ${USER_NAME}:${USER_NAME} /home/${USER_NAME}
 WORKDIR /home/${USER_NAME}
+
+# Add sudo support
+RUN echo ${USER_NAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER_NAME} \
+    && chmod 0440 /etc/sudoers.d/${USER_NAME}
 
 # Activate dev user
 USER ${USER_NAME}

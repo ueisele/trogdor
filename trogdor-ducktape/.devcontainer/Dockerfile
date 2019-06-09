@@ -27,6 +27,11 @@ ENV DEBIAN_FRONTEND=dialog
 # Set the default shell to zsh instead of sh
 ENV SHELL /usr/bin/zsh
 
+# Set entrypoint
+COPY .devcontainer/entrypoint.sh /usr/local/bin/entrypoint.sh
+ENTRYPOINT [ "/usr/bin/tini", "--", "/usr/local/bin/entrypoint.sh" ]
+CMD [ "/bin/zsh" ]
+
 # Create dev user
 ARG USER_NAME="dev"
 ARG USER_ID=1000
@@ -77,4 +82,7 @@ COPY environment.yml* /home/${USER_NAME}
 #RUN if [ -f "environment.yml" ]; then conda env update base -f environment.yml && rm environment.yml*; fi
 RUN if [ -f "environment.yml" ]; then conda env create -f environment.yml && rm environment.yml*; fi
 # Activate environment
-RUN echo "\n#Activate conda environment\n. /opt/conda/etc/profile.d/conda.sh\nconda activate trogdor-ducktape" >> /home/${USER_NAME}/.zshrc
+ARG CONDA_ENV=trogdor-ducktape
+RUN for file in /home/${USER_NAME}/.zshrc /home/${USER_NAME}/.bashrc; do \
+    echo "\n# Activate conda environment\n. /opt/conda/etc/profile.d/conda.sh\nconda activate ${CONDA_ENV}" >> $file \
+    ;done

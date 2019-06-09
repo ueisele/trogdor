@@ -1,7 +1,15 @@
-Vagrantfile.local
-.idea/
+# Python
 *.pyc
 *.ipynb
-.DS_Store
 .ducktape
 results/
+
+# JetBrains
+.idea/
+
+# Visual Studio Code
+bin/
+.settings/
+.classpath
+.project
+.vscode/settings.json

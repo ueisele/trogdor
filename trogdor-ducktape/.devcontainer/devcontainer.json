@@ -1,9 +1,9 @@
 // See https://aka.ms/vscode-remote/devcontainer.json for format details.
 {
 	"name": "Trogdor Ducktape",
-	"dockerComposeFile": "docker-compose.yml",
+	"dockerComposeFile": ["docker-compose.yml", "docker-compose.extend.yml"],
 	"service": "trogdor-ducktape",
-	"workspaceFolder": "/workspace",
+	"workspaceFolder": "/workspace/trogdor-ducktape",
 
 	// Uncomment the next line if you want to publish any ports.
 	// "appPort": [],
@@ -15,10 +15,14 @@
 		"ms-python.python",
 		
 		"joaompinto.asciidoctor-vscode",
-		"streetsidesoftware.code-spell-checker"
+		"streetsidesoftware.code-spell-checker",
+
+		"eamodio.gitlens",
+		"mhutchie.git-graph",
+		"fabiospampinato.vscode-git-history"
 	],
 	"settings": {
-		"python.pythonPath": "/opt/conda/bin/python",
+		"python.pythonPath": "/home/dev/.conda/envs/trogdor-ducktape/bin/python",
 		"python.linting.pylintEnabled": true,
 		"python.linting.enabled": true
 	}

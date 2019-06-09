@@ -1,0 +1,11 @@
+version: '3'
+services:
+  trogdor-ducktape:
+    environment:
+      SSH_AUTH_SOCK: ${SSH_AUTH_SOCK}
+      DISPLAY: ${DISPLAY}
+    volumes:
+      - ~/.gitconfig:/home/dev/.gitconfig:ro
+      - ${HOME}/.gnupg/:/home/dev/.gnupg/:ro
+      - /run/user/1000/gnupg/:/run/user/1000/gnupg/:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro

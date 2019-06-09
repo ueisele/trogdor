@@ -1,0 +1,7 @@
+name: trogdor-ducktape
+channels:
+- defaults
+dependencies:
+- python=2.7
+- pip>=19.1.1
+- pylint<2.0.0

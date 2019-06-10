@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This determines the version of kafkatest that can be published to PyPi and installed with pip
+# This determines the version of Trogdor that can be published to PyPi and installed with pip
 #
 # Note that in development, this version name can't follow Kafka's convention of having a trailing "-SNAPSHOT"
 # due to python version naming restrictions, which are enforced by python packaging tools
@@ -21,5 +21,5 @@
 #
 # Instead, in development branches, the version should have a suffix of the form ".devN"
 #
-# For example, when Kafka is at version 1.0.0-SNAPSHOT, this should be something like "1.0.0.dev0"
-__version__ = '5.4.0.dev0'
+# For example, when Trogdor is at version 0.1.0-SNAPSHOT, this should be something like "0.1.0.dev0"
+__version__ = '0.1.0.dev0'

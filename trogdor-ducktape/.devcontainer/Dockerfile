@@ -26,6 +26,7 @@ ENV DEBIAN_FRONTEND=dialog
 
 # Set the default shell to zsh instead of sh
 ENV SHELL /usr/bin/zsh
+RUN ln -sf /bin/zsh /bin/sh
 
 # Set entrypoint
 COPY .devcontainer/entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -84,5 +85,5 @@ RUN if [ -f "environment.yml" ]; then conda env create -f environment.yml && rm 
 # Activate environment
 ARG CONDA_ENV=trogdor-ducktape
 RUN for file in /home/${USER_NAME}/.zshrc /home/${USER_NAME}/.bashrc; do \
-    echo "\n# Activate conda environment\n. /opt/conda/etc/profile.d/conda.sh\nconda activate ${CONDA_ENV}" >> $file \
+    echo -e "\n# Activate conda environment\n. /opt/conda/etc/profile.d/conda.sh\nconda activate ${CONDA_ENV}" >> $file \
     ;done

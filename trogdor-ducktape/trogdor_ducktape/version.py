@@ -15,7 +15,7 @@
 
 
 from distutils.version import LooseVersion
-from kafkatest.utils import kafkatest_version
+from trogdor_ducktape.utils import kafkatest_version
 
 
 class KafkaVersion(LooseVersion):

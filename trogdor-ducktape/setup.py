@@ -19,7 +19,7 @@ from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
 version = ''
-with open('main/__init__.py', 'r') as fd:
+with open('trogdor_ducktape/__init__.py', 'r') as fd:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE).group(1)
 
 
@@ -48,9 +48,9 @@ setup(name="ducktape-trogdor",
       author="Apache Kafka & Uwe Eisele",
       platforms=["any"], 
       license="apache2.0",
-      packages=find_packages(),
+      packages=find_packages(exclude=('tests')),
       include_package_data=True,
       install_requires=["ducktape==0.7.5", "requests==2.20.0"],
-      tests_require=["pytest", "mock"],
+      tests_require=["pytest==4.6", "mock==3.0"],
       cmdclass={'test': PyTest},
       )

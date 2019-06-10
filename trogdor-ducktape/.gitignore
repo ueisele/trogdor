@@ -1,6 +1,18 @@
 # Python
-*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
 *.ipynb
+
+# Python packaging
+dist/
+.eggs/
+*.egg-info/
+
+# Python tests
+.pytest_cache/
+
+# Ducktape
 .ducktape
 results/
 

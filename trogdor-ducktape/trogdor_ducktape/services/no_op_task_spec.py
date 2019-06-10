@@ -13,27 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from kafkatest.services.trogdor.task_spec import TaskSpec
+from trogdor_ducktape.services.task_spec import TaskSpec
 
 
-class NetworkPartitionFaultSpec(TaskSpec):
+class NoOpTaskSpec(TaskSpec):
     """
-    The specification for a network partition fault.
+    The specification for a nop-op task.
 
-    Network partition faults fracture the network into different partitions
-    that cannot communicate with each other.
+    No-op faults are used to test Trogdor.  They don't do anything,
+    but must be propagated to all Trogdor agents.
     """
 
-    def __init__(self, start_ms, duration_ms, partitions):
+    def __init__(self, start_ms, duration_ms):
         """
-        Create a new NetworkPartitionFaultSpec.
+        Create a new NoOpFault.
 
         :param start_ms:        The start time, as described in task_spec.py
         :param duration_ms:     The duration in milliseconds.
-        :param partitions:      An array of arrays describing the partitions.
-                                The inner arrays may contain either node names,
-                                or ClusterNode objects.
         """
-        super(NetworkPartitionFaultSpec, self).__init__(start_ms, duration_ms)
-        self.message["class"] = "org.apache.kafka.trogdor.fault.NetworkPartitionFaultSpec"
-        self.message["partitions"] = [TaskSpec.to_node_names(p) for p in partitions]
+        super(NoOpTaskSpec, self).__init__(start_ms, duration_ms)
+        self.message["class"] = "org.apache.kafka.trogdor.task.NoOpTaskSpec"

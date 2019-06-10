@@ -9,6 +9,16 @@
             "args": ["env", "update", "trogdor-ducktape", "-f", "environment.yml"],
             "group": "build",
             "problemMatcher": []
+        },
+        {
+            "label": "run tests",
+            "command": "/usr/local/bin/entrypoint.sh",
+            "args": ["python", "setup.py", "test"],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
         }
     ]
 }

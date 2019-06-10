@@ -16,7 +16,7 @@
 import importlib
 import os
 
-from kafkatest.version import get_version, KafkaVersion, DEV_BRANCH
+from trogdor_ducktape.version import get_version, KafkaVersion, DEV_BRANCH
 
 
 """This module serves a few purposes:
@@ -33,7 +33,7 @@ ducktape <TEST_PATH> --globals '{"kafka-path-resolver": "my.path.resolver.Custom
 SCRATCH_ROOT = "/mnt"
 KAFKA_INSTALL_ROOT = "/opt"
 KAFKA_PATH_RESOLVER_KEY = "kafka-path-resolver"
-KAFKA_PATH_RESOLVER = "kafkatest.directory_layout.kafka_path.KafkaSystemTestPathResolver"
+KAFKA_PATH_RESOLVER = "trogdor_ducktape.directory_layout.kafka_path.KafkaSystemTestPathResolver"
 
 # Variables for jar path resolution
 CORE_JAR_NAME = "core"

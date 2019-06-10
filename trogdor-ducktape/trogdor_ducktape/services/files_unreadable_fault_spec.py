@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from kafkatest.services.trogdor.task_spec import TaskSpec
+from trogdor_ducktape.services.task_spec import TaskSpec
 
 
 class FilesUnreadableFaultSpec(TaskSpec):

@@ -15,7 +15,7 @@
 
 from mock import Mock
 
-from kafkatest.version import DEV_BRANCH, V_0_8_2_2, get_version
+from trogdor_ducktape.version import DEV_BRANCH, V_0_8_2_2, get_version
 
 
 class CheckVersion(object):

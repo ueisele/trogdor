@@ -21,7 +21,7 @@ from urllib3 import Retry
 
 from ducktape.services.service import Service
 from ducktape.utils.util import wait_until
-from kafkatest.directory_layout.kafka_path import KafkaPathResolverMixin
+from trogdor_ducktape.directory_layout.kafka_path import KafkaPathResolverMixin
 
 
 class TrogdorService(KafkaPathResolverMixin, Service):

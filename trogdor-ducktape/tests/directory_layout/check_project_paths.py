@@ -14,9 +14,9 @@
 # limitations under the License.
 
 
-from kafkatest.directory_layout.kafka_path import create_path_resolver, KafkaSystemTestPathResolver, \
+from trogdor_ducktape.directory_layout.kafka_path import create_path_resolver, KafkaSystemTestPathResolver, \
     KAFKA_PATH_RESOLVER_KEY
-from kafkatest.version import V_0_9_0_1, DEV_BRANCH, KafkaVersion
+from trogdor_ducktape.version import V_0_9_0_1, DEV_BRANCH, KafkaVersion
 
 
 class DummyContext(object):
@@ -41,7 +41,7 @@ class CheckCreatePathResolver(object):
         """
         mock_context = DummyContext()
         mock_context.globals[KAFKA_PATH_RESOLVER_KEY] = \
-            "unit.directory_layout.check_project_paths.DummyPathResolver"
+            "tests.directory_layout.check_project_paths.DummyPathResolver"
 
         resolver = create_path_resolver(mock_context)
         assert type(resolver) == DummyPathResolver

@@ -15,7 +15,7 @@
 
 
 from ducktape.services.service import Service
-from kafkatest.services.trogdor.task_spec import TaskSpec
+from trogdor_ducktape.services.task_spec import TaskSpec
 
 
 class ConsumeBenchWorkloadSpec(TaskSpec):

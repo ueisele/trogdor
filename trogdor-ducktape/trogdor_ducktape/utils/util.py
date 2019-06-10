@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from kafkatest import __version__ as __kafkatest_version__
+from trogdor_ducktape import __version__ as __kafkatest_version__
 
 import re
 import time

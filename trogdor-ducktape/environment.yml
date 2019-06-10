@@ -3,5 +3,10 @@ channels:
 - defaults
 dependencies:
 - python=2.7
-- pip>=19.1.1
 - pylint<2.0.0
+- pytest=4.6
+- mock=3.0
+- requests=2.20.0
+- pip>=19.1.1
+- pip:
+  - ducktape==0.7.5
